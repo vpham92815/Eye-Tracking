@@ -1,0 +1,36 @@
+#Video feed
+
+import numpy as np
+#Images are stored in 2d arrays and numpy is designed around managing it better. It's needed for any image editing that OpenCV will do. 
+
+import cv2
+#See "GettingImages"
+
+cap = cv2.VideoCapture(0)
+#VideoCapture gets a direct connection to system recognized cameras. 0 is just the first one. "cap" is set to this camera to have a quick way to access the video stream.
+
+while(True):
+    ret, frame = cap.read()
+    # ".read" will output a boolean: true if the frame exists and false if it doesn't. This is put into the "ret" variable and isn't needed here. "frame" is the actual image data of the frame and is what we want.
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Our operations on the frame come here essentially. "gray" is an image that derives from a modified "frame." "cvtColor" will change an image based on whatever instruction you tell it whether it's BGR to Gray or whatnot.
+
+    cv2.imshow('frame',gray)
+    # Display the resulting frame
+    
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+    #If a button is pressed and that button is q
+    
+        break
+        #Get out of the while loop
+
+cap.release()
+#Disconnect from the camera in terms of the code basically.
+
+cv2.destroyAllWindows()
+#Gets rid of the windows made. It's clear in the name.
+
+
+
+#Overall notes: The next step is to learn individual pixel modifications and then the program can be interpretted visually.
