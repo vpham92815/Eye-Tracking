@@ -1,0 +1,36 @@
+#Learning how to pull an image from my computer and display it
+
+
+
+import cv2 as cv
+#Gets the opencv library to use
+
+import sys
+#I still need to research this, but it seems that the code uses this library in order to execute line 18.
+
+img = cv.imread("C:\\Users\\Lisa Lawrence\\Pictures\\Yay.jpg")
+#this line follows the path and obtains the image and stores it as a variable
+
+
+if img is None:
+#Images can be read incorrectly like if it doesn't exist. It'll thus return None if something goes wrong.
+    
+    sys.exit("Could not read the image")
+    #This will stop the program from continuing to run as well as give a message in the debugger.
+
+
+cv.imshow("Display window", img)
+#imshow will make a window containing an image and it has two parameters. One is the window name: the first input. The second is the image itself.
+
+k = cv.waitKey(0)
+#Keeps track of what buttons are being pressed for the next line of code
+
+if k == ord("s"):
+#If the button pressed is "s", continue with the code.
+    
+    cv.imwrite("yay.jpg", img)
+    #Save a file by the name of the first parameter with the information of the second parameter
+    
+    
+    
+#Overall notes: This is the start of being able to have a GUI: a Graphical User Interface. After I learn how to modify images, I can use this to display the program's working to the user. The saving aspect may also come in handy later when debugging a video stream.
