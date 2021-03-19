@@ -1,0 +1,82 @@
+import numpy as np
+#See "GettingVideo"
+
+import cv2
+#See "GettingImages"
+
+cap = cv2.VideoCapture(0)
+#See "GettingVideo"
+
+threshold = 127
+#What I'll be using is a concept known as image thresholding. In order to simplify an image to analyze it faster, I'm converting all pixels that are above this threshold in terms of brightness into white pixels and those below it into black pixels. 
+
+ret, frame = cap.read()
+#See "GettingVideo"
+
+width, height, _ = frame.shape
+#We're getting the width and height and storing it. The third return is colors which isn't needed, but needs to be used as to not error the code
+
+while(True):
+    ret, frame = cap.read()
+    #See "GettingVideo"
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #See "GettingVideo" and "FindingFeatures"
+
+    ret, binary = cv2.threshold(gray,threshold,255,cv2.THRESH_BINARY)
+    # I don't know why "ret" is needed, but this turns the gray scaled image into a binary image
+        #ret is needed because the threshold function outputs two values and that we need to put one of them into a variable. It won't be used though
+    #"threshold" converts the image into a binary image based off a threshold--in this case, a variable called threshold--in order for the image to be analyzed later.
+
+    cv2.imshow('frame',binary)
+    #See "GettingImages"
+
+
+
+    #The following chunk is for debugging purposes. It's supposed to let the user increase or decrease the threshold
+    key = cv2.waitKey(1)
+    #See "GettingImages"
+    if key == ord('o'):
+        threshold += 1
+    if key == ord('l'):
+        threshold -= 1
+    if key == ord('q'):
+        break
+    
+    
+    
+    #Finding edges and editing the image to reflect.
+    for i in range (1,int(width)-1):
+    #Go over each row excluding the very edges
+        for j in range (1,int(height)-1):
+            #Go over each column excluding the very edges
+            if binary[i,j] == 0:
+            #Check if the pixel has a value of 0 also known as black
+                adj = 0
+                #keep track of the number of adjacent black pixels
+
+                #check surrounding pixels on if they're black and increment the number of adjacent black pixels if they are
+                if binary[i+1,j] == 0:
+                    adj += 1
+                if binary[i-1,j] == 0:
+                    adj += 1
+                if binary[i,j+1] == 0:
+                    adj += 1
+                if binary[i,j-1] == 0:
+                    adj += 1
+
+                #make the pixel red if it's an edge pixel which is defined as a black pixel having 2 or 3 adjacent black pixels
+                if adj != 1 and adj != 1 and adj !=4:
+                    edge_img[i,j] = [0,0,255]
+                
+                    
+    cv2.imshow('edge', edge_img)
+    #See "GettingImages"
+    
+#See "GettingVideo"
+cap.release()
+cv2.destroyAllWindows()
+
+
+
+#Overall notes: In terms of a proof of concept, the code works. In terms of practicality, it is far too slow as it goes individually one by one on every single pixel to check and potentially edit. Hopefully, when this is applied to only the eye section, the code will be far faster due to having less pixels to check, but optimization is needed.
