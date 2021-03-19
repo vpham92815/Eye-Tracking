@@ -1,0 +1,60 @@
+import numpy as np
+#See "GettingVideo"
+
+import cv2
+#See "GettingImages"
+
+face_cascade = cv2.CascadeClassifier("C:\\Python38\\Lib\\site-packages\\cv2\\data\\haarcascade_frontalface_default.xml")
+eye_cascade = cv2.CascadeClassifier("C:\\Python38\\Lib\\site-packages\\cv2\\data\\haarcascade_eye.xml")
+#Cascades seem to be a set of features that defines something. In this case, it is a face. OpenCV has its own cascades, and I'm using it to get an idea of how this works.
+#Features are repeatable patterns you can identify such as a black pixel being surrounded by 4 black pixels on all sides being the filled color of something or lines being edges.
+
+cap = cv2.VideoCapture(0)
+#See "GettingVideo"
+
+while(True):
+    ret, img = cap.read()
+    #See "GettingVideo"
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #See "GettingImages"
+
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    #"detectMultiScale" gives rectangles (an x coordinate, a y coordinate, a width, and a height)
+    #The parameters are, in order,: 
+    #The image we want to analyze
+    #Scale factor which seems to be how quickly we want the code to operate. Increasing makes the image we're looking at smaller resulting in a faster, but less accurage read while decreasing works the otherway around.
+    #minNeighbors det'img"ermines how similar to the cascade a detected area needs to be by checking the nearby rectangles to see if they still follow. Increasing this number results in less reads but with higher quality and vice versa.
+    
+    for (x,y,w,h) in faces:
+    #After finding the face, we do operations to each.
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+        #Change "img" to include a blue rectangle over the face
+        
+        roi_gray = gray[y:y+h, x:x+w]
+        #Make an image of only the face. This is in black and white and will be used for analysis
+        
+        roi_color = img[y:y+h, x:x+w]
+        #Make another image of only the face. This will be used for display.
+        
+        eyes = eye_cascade.detectMultiScale(roi_gray)
+        #See above in regards to "detectMultipleScale"
+        
+        for (ex,ey,ew,eh) in eyes:
+            cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+            #Changes "roi_color" which is img to have a green rectangle over the eyes
+            
+    cv2.imshow('img',img)
+    #Show "img" which should include the changes just made
+    
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+    #See "GettingVideo"
+
+cap.release()
+cv2.destroyAllWindows()
+#See "GettingVideo"
+
+
+
+#Overall notes: I can narrow areas to search in order to accelerate the code using these prelearnt cascades. The next step will be finding information about individual pixels on a basic level.
