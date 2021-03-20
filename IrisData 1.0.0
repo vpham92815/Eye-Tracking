@@ -1,1 +1,98 @@
+import numpy as np
+#See "GettingVideo"
 
+import cv2
+#See "GettingImages"
+
+face_cascade = cv2.CascadeClassifier("C:\\Python38\\Lib\\site-packages\\cv2\\data\\haarcascade_frontalface_default.xml")
+eye_cascade = cv2.CascadeClassifier("C:\\Python38\\Lib\\site-packages\\cv2\\data\\haarcascade_eye.xml")
+#See "FindingFeatures"
+
+cap = cv2.VideoCapture(0)
+#See "GettingVideo"
+
+threshold = 127
+#See "FindingEdge" 
+
+while(True):
+    ret, frame = cap.read()
+    #See "GettingVideo"
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #See "GettingVideo" and "FindingFeatures"
+
+    key = cv2.waitKey(1)
+    #See "GettingImages"
+    if key == ord('o'):
+        threshold += 1
+    if key == ord('l'):
+        threshold -= 1
+    if key == ord('q'):
+        break
+
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    #See "FindingFeatures"
+    
+    for (x,y,w,h) in faces:
+        #See "FindingFeatures"
+
+        cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+        #See "FindingFeatures"
+        
+        face_gray = gray[y:y+h, x:x+w]
+        #See "FindingFeatures"
+        
+        face_color = frame[y:y+h, x:x+w]
+        #Make another image of only the face. This will be used for display.
+        
+        eyes = eye_cascade.detectMultiScale(face_gray)
+        #See "FindingFeatures"
+
+        
+        
+        for (ex,ey,ew,eh) in eyes:
+            #See "FindingFeatures"
+            
+            cv2.rectangle(face_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+            #See "FindingFeatures"
+            
+            eye_gray = face_gray[ey:ey+eh, ex:ex+ew]
+            #Similar to how I analyze the entire image in "FindingEdge", I'm making a gray image of the part I'm analyzing. It's just not the entire frame this time and instead just the parts deemed an eye by the cascade.
+            
+            eye_color = face_color[ey:ey+eh, ex:ex+ew]
+            #image to edit "edges" onto later
+            
+            ret, binary = cv2.threshold(eye_gray,threshold,255,cv2.THRESH_BINARY)
+            cv2.imshow('eye',eye_color)
+            
+            #See "FindingEdge"
+            for i in range (1,ew-1):
+                for j in range (1,eh-1):
+                    if binary[i,j] == 0:
+                        adj = 0
+                          #keep track of the number of adjacent black pixels
+
+                        #check surrounding pixels on if they're black and increment the number of adjacent black pixels if they are
+                        if binary[i+1,j] == 0:
+                            adj += 1
+                        if binary[i-1,j] == 0:
+                            adj += 1
+                        if binary[i,j+1] == 0:
+                            adj += 1
+                        if binary[i,j-1] == 0:
+                            adj += 1
+                
+                        if adj != 1 and adj != 1 and adj !=4:
+                            eye_color[i,j] = [0,0,255]
+            
+            
+    cv2.imshow('img',frame)
+    #See "GettingImages"
+
+#See "GettingVideo"
+cap.release()
+cv2.destroyAllWindows()
+
+
+
+#Overall notes: Tests of this has a definitely unrefined result. The numbers for the eye detectMultiscale may be off, but it's finding non-eye areas and identifying it as an eye. This not only slows down the code, but it gives false information. Regarding the edges, I likely need to fiddle around with the threshold values, but I believe a light source will definitely improve it's ability to identify an edge. Future steps include figuring out how to fine tune this process whether it's by machine learning, brute force, or some algorithm; using the data from finding the edge of an eye and calculating gaze; work on a rangefinding method.
