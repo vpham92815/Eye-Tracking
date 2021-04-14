@@ -25,7 +25,7 @@ while(True):
     #The parameters are, in order,: 
     #The image we want to analyze
     #Scale factor which seems to be how quickly we want the code to operate. Increasing makes the image we're looking at smaller resulting in a faster, but less accurage read while decreasing works the otherway around.
-    #minNeighbors det'img"ermines how similar to the cascade a detected area needs to be by checking the nearby rectangles to see if they still follow. Increasing this number results in less reads but with higher quality and vice versa.
+    #minNeighbors determines how similar to the cascade a detected area needs to be by checking the nearby rectangles to see if they still follow. Increasing this number results in less reads but with higher quality and vice versa.
     
     for (x,y,w,h) in faces:
     #After finding the face, we do operations to each. The (x,y,w,h) part basically pulls those values out of each "face" we go through in order to use
